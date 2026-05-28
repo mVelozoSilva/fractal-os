@@ -1,38 +1,91 @@
-.App {
-  text-align: center;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+body {
+  background-color: #F5F2EA;
+  font-family: 'Georgia', serif;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+.fractal-canvas {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  padding: 60px 40px;
 }
 
-.App-link {
-  color: #61dafb;
+.fractal-header {
+  width: 100%;
+  max-width: 680px;
+  margin-bottom: 80px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.fractal-logo {
+  font-size: 18px;
+  font-weight: 400;
+  color: #1E1E1C;
+  letter-spacing: 0.08em;
+}
+
+.invoke-container {
+  width: 100%;
+  max-width: 680px;
+}
+
+.invoke-field {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #A8A39A;
+  padding: 12px 0;
+  font-size: 22px;
+  font-family: 'Georgia', serif;
+  color: #1E1E1C;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.invoke-field::placeholder {
+  color: #A8A39A;
+  font-style: italic;
+}
+
+.invoke-field:focus {
+  border-bottom-color: #E38B1A;
+}
+
+.memorias-container {
+  width: 100%;
+  max-width: 680px;
+  margin-top: 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.memoria {
+  background: #FFFFFF;
+  border: 0.5px solid #A8A39A;
+  border-radius: 8px;
+  padding: 20px 24px;
+  transition: border-color 0.3s ease;
+}
+
+.memoria:hover {
+  border-color: #E38B1A;
+}
+
+.memoria-texto {
+  font-size: 15px;
+  color: #1E1E1C;
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+
+.memoria-fecha {
+  font-size: 12px;
+  color: #A8A39A;
 }
