@@ -10,11 +10,14 @@ function App() {
         id: 1,
         texto: "Fractal no es software. Es un lenguaje común entre mente humana y cognición artificial.",
         fecha: "27 mayo 2026",
-        anclada: false
+        anclada: false,
+        constelacion: "Visión"
       }
     ];
   });
   const [invocando, setInvocando] = useState('');
+  const [pendiente, setPendiente] = useState(null);
+  const [constelacionInput, setConstelacionInput] = useState('');
 
   useEffect(() => {
     localStorage.setItem('fractal-memorias', JSON.stringify(memorias));
@@ -30,14 +33,32 @@ function App() {
 
   function handleKeyDown(e) {
     if (e.key === 'Enter' && invocando.trim() !== '') {
-      const nueva = {
+      setPendiente({
         id: Date.now(),
         texto: invocando.trim(),
         fecha: getFecha(),
-        anclada: false
+        anclada: false,
+        constelacion: ''
+      });
+      setInvocando('');
+    }
+  }
+
+  function handleConstelacion(e) {
+    if (e.key === 'Enter') {
+      const nueva = {
+        ...pendiente,
+        constelacion: constelacionInput.trim()
       };
       setMemorias([nueva, ...memorias]);
-      setInvocando('');
+      setPendiente(null);
+      setConstelacionInput('');
+    }
+    if (e.key === 'Escape') {
+      const nueva = { ...pendiente, constelacion: '' };
+      setMemorias([nueva, ...memorias]);
+      setPendiente(null);
+      setConstelacionInput('');
     }
   }
 
@@ -50,10 +71,21 @@ function App() {
   const ancladas = memorias.filter(m => m.anclada);
   const normales = memorias.filter(m => !m.anclada);
 
+  const constelaciones = [...new Set(
+    memorias.map(m => m.constelacion).filter(c => c !== '')
+  )];
+
   return (
     <div className="fractal-canvas">
       <div className="fractal-header">
         <span className="fractal-logo">Fractal</span>
+        {constelaciones.length > 0 && (
+          <div className="constelaciones-nav">
+            {constelaciones.map(c => (
+              <span key={c} className="constelacion-tag">{c}</span>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="invoke-container">
@@ -65,6 +97,22 @@ function App() {
           onChange={(e) => setInvocando(e.target.value)}
           onKeyDown={handleKeyDown}
         />
+        {pendiente && (
+          <div className="constelacion-prompt">
+            <span className="constelacion-hint">
+              ¿A qué constelación pertenece? (Enter para confirmar · Escape para omitir)
+            </span>
+            <input
+              className="constelacion-field"
+              type="text"
+              placeholder="nombre de la constelación..."
+              value={constelacionInput}
+              onChange={(e) => setConstelacionInput(e.target.value)}
+              onKeyDown={handleConstelacion}
+              autoFocus
+            />
+          </div>
+        )}
       </div>
 
       {ancladas.length > 0 && (
@@ -76,6 +124,7 @@ function App() {
               texto={m.texto}
               fecha={m.fecha}
               anclada={m.anclada}
+              constelacion={m.constelacion}
               onAnclar={() => toggleAnclar(m.id)}
             />
           ))}
@@ -92,6 +141,7 @@ function App() {
             texto={m.texto}
             fecha={m.fecha}
             anclada={m.anclada}
+            constelacion={m.constelacion}
             onAnclar={() => toggleAnclar(m.id)}
           />
         ))}

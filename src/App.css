@@ -132,3 +132,59 @@ body {
   margin-bottom: 8px;
   display: block;
 }
+
+.constelaciones-nav {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.constelacion-tag {
+  font-size: 11px;
+  color: #E38B1A;
+  border: 0.5px solid #E38B1A;
+  border-radius: 20px;
+  padding: 3px 10px;
+  letter-spacing: 0.06em;
+}
+
+.constelacion-prompt {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.constelacion-hint {
+  font-size: 12px;
+  color: #A8A39A;
+  font-style: italic;
+}
+
+.constelacion-field {
+  background: transparent;
+  border: none;
+  border-bottom: 0.5px solid #A8A39A;
+  padding: 8px 0;
+  font-size: 15px;
+  font-family: 'Georgia', serif;
+  color: #1E1E1C;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.constelacion-field:focus {
+  border-bottom-color: #E38B1A;
+}
+
+.memoria-constelacion {
+  display: inline-block;
+  font-size: 11px;
+  color: #E38B1A;
+  border: 0.5px solid #E38B1A;
+  border-radius: 20px;
+  padding: 2px 10px;
+  margin-bottom: 10px;
+  letter-spacing: 0.06em;
+}
