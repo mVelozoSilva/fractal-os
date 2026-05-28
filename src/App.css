@@ -89,3 +89,46 @@ body {
   font-size: 12px;
   color: #A8A39A;
 }
+
+.memoria-anclada {
+  border-color: #E38B1A;
+  background: #FAEEDA;
+}
+
+.memoria-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.anclar-btn {
+  background: transparent;
+  border: 0.5px solid #A8A39A;
+  border-radius: 4px;
+  padding: 4px 12px;
+  font-size: 12px;
+  color: #A8A39A;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Georgia', serif;
+}
+
+.anclar-btn:hover {
+  border-color: #E38B1A;
+  color: #E38B1A;
+}
+
+.anclar-btn.anclada {
+  border-color: #E38B1A;
+  color: #E38B1A;
+}
+
+.seccion-label {
+  font-size: 11px;
+  color: #A8A39A;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: block;
+}
