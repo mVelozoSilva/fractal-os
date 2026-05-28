@@ -44,6 +44,32 @@ function App() {
     synth.speak(utterance);
   }
 
+ async function preguntarAClaude(mensaje) {
+  const respuesta = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': process.env.REACT_APP_CLAUDE_KEY,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-5',
+      max_tokens: 300,
+      system: `Eres Fractal, una presencia cognitiva dentro del computador de Macarena. Hablas en español chileno, con calma, calidez y claridad. Nunca dices que eres una IA. Eres muy breve — máximo 2 oraciones. Acompañas sin invadir.`,
+      messages: [{ role: 'user', content: mensaje }]
+    })
+  });
+  const data = await respuesta.json();
+  console.log('Respuesta Claude:', data);
+  if (data.content && data.content[0]) {
+    return data.content[0].text;
+  } else {
+    console.error('Error de Claude:', data);
+    return 'Hubo un problema al conectar.';
+  }
+}
+
   function iniciarEscucha() {
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -73,19 +99,21 @@ function App() {
     rec.start();
   }
 
-  function handleKeyDown(e) {
-    if (e.key === 'Enter' && invocando.trim() !== '') {
-      setPendiente({
-        id: Date.now(),
-        texto: invocando.trim(),
-        fecha: getFecha(),
-        anclada: false,
-        constelacion: ''
-      });
-      setInvocando('');
-      hablar('Recibido. ¿A qué constelación pertenece?');
-    }
+  async function handleKeyDown(e) {
+  if (e.key === 'Enter' && invocando.trim() !== '') {
+    const texto = invocando.trim();
+    setPendiente({
+      id: Date.now(),
+      texto,
+      fecha: getFecha(),
+      anclada: false,
+      constelacion: ''
+    });
+    setInvocando('');
+    const respuesta = await preguntarAClaude(texto);
+    hablar(respuesta);
   }
+}
 
   function handleConstelacion(e) {
     if (e.key === 'Enter') {
