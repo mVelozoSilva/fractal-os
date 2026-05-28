@@ -230,3 +230,12 @@ body {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
 }
+
+.invoke-field.confirmando {
+  border-bottom-color: #E38B1A;
+}
+
+.invoke-field.confirmando::placeholder {
+  color: #E38B1A;
+  font-style: normal;
+}
