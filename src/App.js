@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './App.css';
 import Memoria from './Memoria';
 
@@ -15,9 +15,12 @@ function App() {
       }
     ];
   });
+
   const [invocando, setInvocando] = useState('');
   const [pendiente, setPendiente] = useState(null);
   const [constelacionInput, setConstelacionInput] = useState('');
+  const [escuchando, setEscuchando] = useState(false);
+  const reconocimientoRef = useRef(null);
 
   useEffect(() => {
     localStorage.setItem('fractal-memorias', JSON.stringify(memorias));
@@ -31,6 +34,45 @@ function App() {
     });
   }
 
+  function hablar(texto) {
+    const synth = window.speechSynthesis;
+    synth.cancel();
+    const utterance = new SpeechSynthesisUtterance(texto);
+    utterance.lang = 'es-CL';
+    utterance.rate = 0.95;
+    utterance.pitch = 1;
+    synth.speak(utterance);
+  }
+
+  function iniciarEscucha() {
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      hablar('Tu navegador no soporta reconocimiento de voz.');
+      return;
+    }
+
+    const rec = new SpeechRecognition();
+    rec.lang = 'es-CL';
+    rec.continuous = false;
+    rec.interimResults = false;
+
+    rec.onstart = () => setEscuchando(true);
+
+    rec.onresult = (e) => {
+      const texto = e.results[0][0].transcript;
+      setInvocando(texto);
+      setEscuchando(false);
+    };
+
+    rec.onerror = () => setEscuchando(false);
+    rec.onend = () => setEscuchando(false);
+
+    reconocimientoRef.current = rec;
+    rec.start();
+  }
+
   function handleKeyDown(e) {
     if (e.key === 'Enter' && invocando.trim() !== '') {
       setPendiente({
@@ -41,24 +83,24 @@ function App() {
         constelacion: ''
       });
       setInvocando('');
+      hablar('Recibido. ¿A qué constelación pertenece?');
     }
   }
 
   function handleConstelacion(e) {
     if (e.key === 'Enter') {
-      const nueva = {
-        ...pendiente,
-        constelacion: constelacionInput.trim()
-      };
+      const nueva = { ...pendiente, constelacion: constelacionInput.trim() };
       setMemorias([nueva, ...memorias]);
       setPendiente(null);
       setConstelacionInput('');
+      hablar('Memoria anclada.');
     }
     if (e.key === 'Escape') {
       const nueva = { ...pendiente, constelacion: '' };
       setMemorias([nueva, ...memorias]);
       setPendiente(null);
       setConstelacionInput('');
+      hablar('Guardado.');
     }
   }
 
@@ -70,7 +112,6 @@ function App() {
 
   const ancladas = memorias.filter(m => m.anclada);
   const normales = memorias.filter(m => !m.anclada);
-
   const constelaciones = [...new Set(
     memorias.map(m => m.constelacion).filter(c => c !== '')
   )];
@@ -89,14 +130,24 @@ function App() {
       </div>
 
       <div className="invoke-container">
-        <input
-          className="invoke-field"
-          type="text"
-          placeholder="Invocar..."
-          value={invocando}
-          onChange={(e) => setInvocando(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
+        <div className="invoke-row">
+          <input
+            className="invoke-field"
+            type="text"
+            placeholder="Invocar..."
+            value={invocando}
+            onChange={(e) => setInvocando(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+          <button
+            className={`mic-btn ${escuchando ? 'escuchando' : ''}`}
+            onClick={iniciarEscucha}
+            title="Hablar"
+          >
+            {escuchando ? '●' : '○'}
+          </button>
+        </div>
+
         {pendiente && (
           <div className="constelacion-prompt">
             <span className="constelacion-hint">

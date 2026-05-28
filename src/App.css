@@ -188,3 +188,45 @@ body {
   margin-bottom: 10px;
   letter-spacing: 0.06em;
 }
+
+.invoke-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.invoke-row .invoke-field {
+  flex: 1;
+}
+
+.mic-btn {
+  background: transparent;
+  border: 0.5px solid #A8A39A;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 18px;
+  color: #A8A39A;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mic-btn:hover {
+  border-color: #E38B1A;
+  color: #E38B1A;
+}
+
+.mic-btn.escuchando {
+  border-color: #E38B1A;
+  color: #E38B1A;
+  animation: pulso 1s ease-in-out infinite;
+}
+
+@keyframes pulso {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
