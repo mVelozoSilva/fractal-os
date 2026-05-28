@@ -44,7 +44,13 @@ function App() {
     synth.speak(utterance);
   }
 
- async function preguntarAClaude(mensaje) {
+ async function preguntarAClaude(mensaje, contextoArchivos = '') {
+  const sistemaBase = `Eres Fractal, una presencia cognitiva dentro del computador de Macarena. Hablas en español neutro, con calma, calidez y claridad. Nunca dices que eres una IA. Eres muy breve — máximo 3 oraciones. Acompañas sin invadir.`;
+
+  const sistemaConArchivos = contextoArchivos
+    ? `${sistemaBase}\n\nTienes acceso al siguiente contenido de los archivos de Macarena:\n${contextoArchivos}\n\nResponde basándote en esa información cuando sea relevante.`
+    : sistemaBase;
+
   const respuesta = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -55,19 +61,16 @@ function App() {
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-5',
-      max_tokens: 300,
-      system: `Eres Fractal, una presencia cognitiva dentro del computador de Macarena. Hablas en español chileno, con calma, calidez y claridad. Nunca dices que eres una IA. Eres muy breve — máximo 2 oraciones. Acompañas sin invadir.`,
+      max_tokens: 400,
+      system: sistemaConArchivos,
       messages: [{ role: 'user', content: mensaje }]
     })
   });
   const data = await respuesta.json();
-  console.log('Respuesta Claude:', data);
   if (data.content && data.content[0]) {
     return data.content[0].text;
-  } else {
-    console.error('Error de Claude:', data);
-    return 'Hubo un problema al conectar.';
   }
+  return 'No pude procesar eso.';
 }
 
   function iniciarEscucha() {
@@ -102,6 +105,47 @@ function App() {
   async function handleKeyDown(e) {
   if (e.key === 'Enter' && invocando.trim() !== '') {
     const texto = invocando.trim();
+    setInvocando('');
+
+    const mencionaArchivo =
+      texto.toLowerCase().includes('excel') ||
+      texto.toLowerCase().includes('archivo') ||
+      texto.toLowerCase().includes('carpeta') ||
+      texto.toLowerCase().includes('documento') ||
+      texto.toLowerCase().includes('factura') ||
+      texto.toLowerCase().includes('busca');
+
+    let contexto = '';
+
+    if (mencionaArchivo && window.fractalFS) {
+      try {
+        hablar('Revisando tus archivos...');
+        const home = window.fractalFS.rutaHome();
+        const carpetaDocs = window.fractalFS.unirRuta(home, 'Documents');
+        const archivos = window.fractalFS.leerCarpeta(carpetaDocs);
+        const excels = archivos
+          .filter(a => a.endsWith('.xlsx') || a.endsWith('.xls'))
+          .slice(0, 3);
+
+        for (const archivo of excels) {
+          const ruta = window.fractalFS.unirRuta(carpetaDocs, archivo);
+          const buffer = window.fractalFS.leerArchivoBuffer(ruta);
+          const XLSX = await import('xlsx');
+          const wb = XLSX.read(buffer, { type: 'buffer' });
+          wb.SheetNames.forEach(nombre => {
+            const hoja = wb.Sheets[nombre];
+            const csv = XLSX.utils.sheet_to_csv(hoja);
+            contexto += `Archivo: ${archivo} — Hoja: ${nombre}\n${csv.slice(0, 2000)}\n\n`;
+          });
+        }
+      } catch (err) {
+        console.error('Error leyendo archivos:', err);
+      }
+    }
+
+    const respuesta = await preguntarAClaude(texto, contexto);
+    hablar(respuesta);
+
     setPendiente({
       id: Date.now(),
       texto,
@@ -109,9 +153,6 @@ function App() {
       anclada: false,
       constelacion: ''
     });
-    setInvocando('');
-    const respuesta = await preguntarAClaude(texto);
-    hablar(respuesta);
   }
 }
 

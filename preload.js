@@ -1,14 +1,28 @@
 const { contextBridge } = require('electron');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 contextBridge.exposeInMainWorld('fractalFS', {
   leerCarpeta: (rutaCarpeta) => {
-    const archivos = fs.readdirSync(rutaCarpeta);
-    return archivos;
+    try {
+      return fs.readdirSync(rutaCarpeta);
+    } catch (e) {
+      return [];
+    }
   },
-  leerArchivo: (rutaArchivo) => {
+  leerArchivoBuffer: (rutaArchivo) => {
+    return fs.readFileSync(rutaArchivo);
+  },
+  leerArchivoTexto: (rutaArchivo) => {
     return fs.readFileSync(rutaArchivo, 'utf8');
   },
-  rutaHome: () => require('os').homedir()
+  escribirArchivo: (rutaArchivo, contenido) => {
+    fs.writeFileSync(rutaArchivo, contenido, 'utf8');
+    return true;
+  },
+  rutaHome: () => os.homedir(),
+  unirRuta: (...partes) => path.join(...partes)
 });
+
+contextBridge.exposeInMainWorld('mammoth', require('mammoth'));

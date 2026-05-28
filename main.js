@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, session } = require('electron');
 const path = require('path');
 
 function createWindow() {
@@ -6,18 +6,26 @@ function createWindow() {
     width: 1200,
     height: 800,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
+      nodeIntegration: false,
+      contextIsolation: true,
+      sandbox: false,
       preload: path.join(__dirname, 'preload.js')
     },
-    titleBarStyle: 'hiddenInset',
     backgroundColor: '#F5F2EA',
     title: 'Fractal OS'
   });
 
-  const startUrl = process.env.ELECTRON_START_URL || 
+  session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
+    callback(true);
+  });
+
+  session.defaultSession.setPermissionCheckHandler(() => {
+    return true;
+  });
+
+  const startUrl = process.env.ELECTRON_START_URL ||
     `file://${path.join(__dirname, 'build/index.html')}`;
-  
+
   win.loadURL(startUrl);
 }
 
